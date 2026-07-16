@@ -1,0 +1,465 @@
+{
+  "title": "Azure Microservices SaaS App - Standard Alternative",
+  "provider": "azure",
+  "direction": "TB",
+  "groups": [
+    {
+      "id": "vnet1",
+      "label": "Workload VNet",
+      "parent": null
+    },
+    {
+      "id": "appgw_subnet",
+      "label": "App Gateway Subnet",
+      "parent": "vnet1"
+    },
+    {
+      "id": "apps_subnet",
+      "label": "Container Apps Subnet",
+      "parent": "vnet1"
+    },
+    {
+      "id": "pe_subnet",
+      "label": "Private Endpoint Subnet",
+      "parent": "vnet1"
+    },
+    {
+      "id": "data_services",
+      "label": "Managed Data Services",
+      "parent": null
+    },
+    {
+      "id": "security_ops",
+      "label": "Security & Operations",
+      "parent": null
+    },
+    {
+      "id": "platform_controls",
+      "label": "Platform Controls",
+      "parent": null
+    }
+  ],
+  "nodes": [
+    {
+      "id": "user1",
+      "type": "user",
+      "label": "SaaS Users",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "afd1",
+      "type": "cdn",
+      "label": "Azure Front Door",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "appgw1",
+      "type": "network.application_gateway",
+      "label": "App Gateway WAF",
+      "group": "appgw_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "apps1",
+      "type": "compute.container",
+      "label": "Container Apps",
+      "group": "apps_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "mi1",
+      "type": "identity.managed",
+      "label": "Managed Identity",
+      "group": "security_ops",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sqlpe1",
+      "type": "network.private_endpoint",
+      "label": "SQL Private Endpoint",
+      "group": "pe_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "redispe1",
+      "type": "network.private_endpoint",
+      "label": "Redis Private Endpoint",
+      "group": "pe_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sbpe1",
+      "type": "network.private_endpoint",
+      "label": "Service Bus Endpoint",
+      "group": "pe_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "blobpe1",
+      "type": "network.private_endpoint",
+      "label": "Blob Private Endpoint",
+      "group": "pe_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "kvpe1",
+      "type": "network.private_endpoint",
+      "label": "Key Vault Endpoint",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sql1",
+      "type": "database.relational",
+      "label": "Azure SQL Primary",
+      "group": "data_services",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sql2",
+      "type": "database.relational",
+      "label": "Azure SQL Failover",
+      "group": "data_services",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "redis1",
+      "type": "database.cache",
+      "label": "Azure Cache Redis",
+      "group": "data_services",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sb1",
+      "type": "queue",
+      "label": "Service Bus",
+      "group": "data_services",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "blob1",
+      "type": "storage.object",
+      "label": "Blob Storage",
+      "group": "data_services",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "kv1",
+      "type": "secrets",
+      "label": "Key Vault",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "dns1",
+      "type": "dns.private",
+      "label": "Private DNS Zones",
+      "group": "security_ops",
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "mon1",
+      "type": "monitoring",
+      "label": "Azure Monitor",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "logs1",
+      "type": "logging",
+      "label": "Log Analytics",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "azure_policy",
+      "type": "governance.policy",
+      "label": "Azure Policy",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "microsoft_entra_id",
+      "type": "auth.identity_center",
+      "label": "Microsoft Entra ID",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "defender_for_cloud",
+      "type": "security.guardduty",
+      "label": "Defender for Cloud",
+      "group": null,
+      "suggested_type": null,
+      "suggestion_reason": null
+    },
+    {
+      "id": "sql2_pe",
+      "type": "network.private_endpoint",
+      "label": "Azure SQL Failover PE",
+      "group": "pe_subnet",
+      "suggested_type": null,
+      "suggestion_reason": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "user1",
+      "target": "afd1",
+      "label": "HTTPS",
+      "style": "solid"
+    },
+    {
+      "source": "afd1",
+      "target": "appgw1",
+      "label": "Origin Traffic",
+      "style": "solid"
+    },
+    {
+      "source": "appgw1",
+      "target": "apps1",
+      "label": "WAF Routed Requests",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "mi1",
+      "label": "Workload Identity",
+      "style": "dashed"
+    },
+    {
+      "source": "mi1",
+      "target": "kv1",
+      "label": "Secrets Access",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "sqlpe1",
+      "label": "Private SQL",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "sqlpe1",
+      "label": "Private Link",
+      "style": "solid"
+    },
+    {
+      "source": "sql1",
+      "target": "sql2",
+      "label": "Failover Group",
+      "style": "bold"
+    },
+    {
+      "source": "apps1",
+      "target": "redispe1",
+      "label": "Cache Access",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "redispe1",
+      "label": "Private Link",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "sbpe1",
+      "label": "Async Messaging",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "sbpe1",
+      "label": "Private Link",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "blobpe1",
+      "label": "Object Access",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "blobpe1",
+      "label": "Private Link",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "kvpe1",
+      "label": "Secrets Management",
+      "style": "solid"
+    },
+    {
+      "source": "apps1",
+      "target": "kvpe1",
+      "label": "Private Link",
+      "style": "solid"
+    },
+    {
+      "source": "dns1",
+      "target": "sqlpe1",
+      "label": "Name Resolution",
+      "style": "dashed"
+    },
+    {
+      "source": "dns1",
+      "target": "redispe1",
+      "label": "Name Resolution",
+      "style": "dashed"
+    },
+    {
+      "source": "dns1",
+      "target": "sbpe1",
+      "label": "Name Resolution",
+      "style": "dashed"
+    },
+    {
+      "source": "dns1",
+      "target": "blobpe1",
+      "label": "Name Resolution",
+      "style": "dashed"
+    },
+    {
+      "source": "dns1",
+      "target": "kvpe1",
+      "label": "Name Resolution",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "mon1",
+      "label": "Metrics",
+      "style": "dashed"
+    },
+    {
+      "source": "appgw1",
+      "target": "logs1",
+      "label": "Access Logs",
+      "style": "dashed"
+    },
+    {
+      "source": "mon1",
+      "target": "logs1",
+      "label": "Logs & Metrics",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "sqlpe1",
+      "label": "SQL Queries",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "redispe1",
+      "label": "Cache Access",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "sbpe1",
+      "label": "Messages",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "blobpe1",
+      "label": "File Storage",
+      "style": "dashed"
+    },
+    {
+      "source": "apps1",
+      "target": "kvpe1",
+      "label": "Secrets Access",
+      "style": "dashed"
+    },
+    {
+      "source": "azure_policy",
+      "target": "appgw1",
+      "label": "Policy",
+      "style": "dashed"
+    },
+    {
+      "source": "microsoft_entra_id",
+      "target": "appgw1",
+      "label": "RBAC",
+      "style": "dashed"
+    },
+    {
+      "source": "defender_for_cloud",
+      "target": "appgw1",
+      "label": "Security Posture",
+      "style": "dashed"
+    },
+    {
+      "source": "sqlpe1",
+      "target": "sql1",
+      "label": "SQL Queries",
+      "style": "dashed"
+    },
+    {
+      "source": "redispe1",
+      "target": "redis1",
+      "label": "Cache Access",
+      "style": "dashed"
+    },
+    {
+      "source": "sbpe1",
+      "target": "sb1",
+      "label": "Messages",
+      "style": "dashed"
+    },
+    {
+      "source": "blobpe1",
+      "target": "blob1",
+      "label": "File Storage",
+      "style": "dashed"
+    },
+    {
+      "source": "kvpe1",
+      "target": "kv1",
+      "label": "Secrets Access",
+      "style": "dashed"
+    },
+    {
+      "source": "appgw1",
+      "target": "sql2_pe",
+      "label": "Private Link",
+      "style": "dashed"
+    },
+    {
+      "source": "sql2_pe",
+      "target": "sql2",
+      "label": "Private Link",
+      "style": "dashed"
+    }
+  ],
+  "show_legend": true
+}
