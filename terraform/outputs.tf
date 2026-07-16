@@ -1,82 +1,22 @@
-# >>> archly:node:appgw1 >>>
-output "appgw1_id" {
-  description = "azurerm_application_gateway id"
-  value       = azurerm_application_gateway.appgw1.id
-  sensitive   = false
-}
-# <<< archly:node:appgw1 <<<
 
-# >>> archly:node:mi1 >>>
-output "mi1_id" {
-  description = "azurerm_managed id"
-  value       = azurerm_managed.mi1.id
-  sensitive   = false
-}
-# <<< archly:node:mi1 <<<
 
-# >>> archly:node:sqlpe1 >>>
-output "sqlpe1_id" {
-  description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.sqlpe1.id
-  sensitive   = false
-}
-# <<< archly:node:sqlpe1 <<<
 
-# >>> archly:node:redispe1 >>>
-output "redispe1_id" {
-  description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.redispe1.id
-  sensitive   = false
-}
-# <<< archly:node:redispe1 <<<
 
-# >>> archly:node:sbpe1 >>>
-output "sbpe1_id" {
-  description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.sbpe1.id
-  sensitive   = false
-}
-# <<< archly:node:sbpe1 <<<
 
-# >>> archly:node:blobpe1 >>>
-output "blobpe1_id" {
-  description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.blobpe1.id
-  sensitive   = false
-}
-# <<< archly:node:blobpe1 <<<
 
-# >>> archly:node:kvpe1 >>>
-output "kvpe1_id" {
-  description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.kvpe1.id
-  sensitive   = false
-}
-# <<< archly:node:kvpe1 <<<
 
-# >>> archly:node:kv1 >>>
-output "kv1_id" {
-  description = "Key Vault id (reference this as key_vault_id elsewhere)"
-  value       = azurerm_key_vault.kv1.id
-  sensitive   = false
-}
-# <<< archly:node:kv1 <<<
 
-# >>> archly:node:dns1 >>>
-output "dns1_id" {
-  description = "azurerm_private id"
-  value       = azurerm_private.dns1.id
-  sensitive   = false
-}
-# <<< archly:node:dns1 <<<
 
-# >>> archly:node:logs1 >>>
-output "logs1_id" {
-  description = "azurerm_logging id"
-  value       = azurerm_logging.logs1.id
-  sensitive   = false
-}
-# <<< archly:node:logs1 <<<
+
+
+
+
+
+
+
+
+
+
 
 # >>> archly:node:azure_policy >>>
 output "azure_policy_id" {
@@ -86,26 +26,98 @@ output "azure_policy_id" {
 }
 # <<< archly:node:azure_policy <<<
 
-# >>> archly:node:microsoft_entra_id >>>
-output "microsoft_entra_id_id" {
-  description = "azurerm_identity_center id"
-  value       = azurerm_identity_center.microsoft_entra_id.id
+# >>> archly:node:agw1 >>>
+output "agw1_id" {
+  description = "azurerm_application_gateway id"
+  value       = azurerm_application_gateway.agw1.id
   sensitive   = false
 }
-# <<< archly:node:microsoft_entra_id <<<
+# <<< archly:node:agw1 <<<
 
-# >>> archly:node:defender_for_cloud >>>
-output "defender_for_cloud_id" {
-  description = "azurerm_guardduty id"
-  value       = azurerm_guardduty.defender_for_cloud.id
-  sensitive   = false
-}
-# <<< archly:node:defender_for_cloud <<<
-
-# >>> archly:node:sql2_pe >>>
-output "sql2_pe_id" {
+# >>> archly:node:blob1_pe >>>
+output "blob1_pe_id" {
   description = "azurerm_private_endpoint id"
-  value       = azurerm_private_endpoint.sql2_pe.id
+  value       = azurerm_private_endpoint.blob1_pe.id
   sensitive   = false
 }
-# <<< archly:node:sql2_pe <<<
+# <<< archly:node:blob1_pe <<<
+
+# >>> archly:node:defender >>>
+output "defender_id" {
+  description = "azurerm_security_hub id"
+  value       = azurerm_security_hub.defender.id
+  sensitive   = false
+}
+# <<< archly:node:defender <<<
+
+# >>> archly:node:keyvault1 >>>
+output "keyvault1_id" {
+  description = "azurerm_manager id"
+  value       = azurerm_manager.keyvault1.id
+  sensitive   = false
+}
+# <<< archly:node:keyvault1 <<<
+
+# >>> archly:node:keyvault1_pe >>>
+output "keyvault1_pe_id" {
+  description = "azurerm_private_endpoint id"
+  value       = azurerm_private_endpoint.keyvault1_pe.id
+  sensitive   = false
+}
+# <<< archly:node:keyvault1_pe <<<
+
+# >>> archly:node:managed_identity >>>
+output "managed_identity_id" {
+  description = "azurerm_managed id"
+  value       = azurerm_managed.managed_identity.id
+  sensitive   = false
+}
+# <<< archly:node:managed_identity <<<
+
+# >>> archly:node:private_dns >>>
+output "private_dns_id" {
+  description = "azurerm_private id"
+  value       = azurerm_private.private_dns.id
+  sensitive   = false
+}
+# <<< archly:node:private_dns <<<
+
+# >>> archly:node:rbac >>>
+output "rbac_id" {
+  description = "azurerm_identity_center id"
+  value       = azurerm_identity_center.rbac.id
+  sensitive   = false
+}
+# <<< archly:node:rbac <<<
+
+# >>> archly:node:redis1_pe >>>
+output "redis1_pe_id" {
+  description = "azurerm_private_endpoint id"
+  value       = azurerm_private_endpoint.redis1_pe.id
+  sensitive   = false
+}
+# <<< archly:node:redis1_pe <<<
+
+# >>> archly:node:servicebus1_pe >>>
+output "servicebus1_pe_id" {
+  description = "azurerm_private_endpoint id"
+  value       = azurerm_private_endpoint.servicebus1_pe.id
+  sensitive   = false
+}
+# <<< archly:node:servicebus1_pe <<<
+
+# >>> archly:node:sql1_pe >>>
+output "sql1_pe_id" {
+  description = "azurerm_private_endpoint id"
+  value       = azurerm_private_endpoint.sql1_pe.id
+  sensitive   = false
+}
+# <<< archly:node:sql1_pe <<<
+
+# >>> archly:node:sql_failover_pe >>>
+output "sql_failover_pe_id" {
+  description = "azurerm_private_endpoint id"
+  value       = azurerm_private_endpoint.sql_failover_pe.id
+  sensitive   = false
+}
+# <<< archly:node:sql_failover_pe <<<
