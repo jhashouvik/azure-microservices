@@ -8,21 +8,22 @@
 #
 # Sensitive variables used by this project:
 #   sql1_administrator_password  (export TF_VAR_sql1_administrator_password=... )
-#   sql2_administrator_password  (export TF_VAR_sql2_administrator_password=... )
+#   sql_failover_administrator_password  (export TF_VAR_sql_failover_administrator_password=... )
 
-appgw1_name = "REPLACE_ME"
-apps1_container_image = "REPLACE_ME"
+agw1_name = "REPLACE_ME"
 azure_policy_name = "REPLACE_ME"
-blobpe1_name = "REPLACE_ME"
-defender_for_cloud_name = "REPLACE_ME"
-dns1_name = "REPLACE_ME"
-kvpe1_name = "REPLACE_ME"
-logs1_name = "REPLACE_ME"
-mi1_name = "REPLACE_ME"
-microsoft_entra_id_name = "REPLACE_ME"
-redispe1_name = "REPLACE_ME"
+blob1_pe_name = "REPLACE_ME"
+containerapps1_container_image = "REPLACE_ME"
+defender_name = "REPLACE_ME"
+key_vault_id = "REPLACE_ME"
+keyvault1_name = "REPLACE_ME"
+keyvault1_pe_name = "REPLACE_ME"
+managed_identity_name = "REPLACE_ME"
+private_dns_name = "REPLACE_ME"
+rbac_name = "REPLACE_ME"
+redis1_pe_name = "REPLACE_ME"
 resource_group_name = "REPLACE_ME"
-sbpe1_name = "REPLACE_ME"
-sql2_pe_name = "REPLACE_ME"
-sqlpe1_name = "REPLACE_ME"
+servicebus1_pe_name = "REPLACE_ME"
+sql1_pe_name = "REPLACE_ME"
+sql_failover_pe_name = "REPLACE_ME"
 tenant_id = "REPLACE_ME"
