@@ -42,81 +42,27 @@ locals {
 }
 
 # >>> archly:group:vnet1 >>>
-# Workload VNet (network boundary)
+# VNet (subnet within 'Management Group')
 
-resource "azurerm_virtual_network" "vnet1" {
-  name                = "vnet1"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  address_space       = [var.vnet1_address_space]
+resource "azurerm_subnet" "vnet1" {
+  name                 = "vnet1"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.vnet1_address_prefix]
 }
 # <<< archly:group:vnet1 <<<
 
-# >>> archly:group:data_services >>>
-# Managed Data Services (network boundary)
 
-resource "azurerm_virtual_network" "data_services" {
-  name                = "data_services"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  address_space       = [var.data_services_address_space]
-}
-# <<< archly:group:data_services <<<
 
-# >>> archly:group:security_ops >>>
-# Security & Operations (network boundary)
 
-resource "azurerm_virtual_network" "security_ops" {
-  name                = "security_ops"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  address_space       = [var.security_ops_address_space]
-}
-# <<< archly:group:security_ops <<<
 
-# >>> archly:group:platform_controls >>>
-# Platform Controls (network boundary)
 
-resource "azurerm_virtual_network" "platform_controls" {
-  name                = "platform_controls"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  address_space       = [var.platform_controls_address_space]
-}
-# <<< archly:group:platform_controls <<<
 
-# >>> archly:group:appgw_subnet >>>
-# App Gateway Subnet (subnet within 'Workload VNet')
 
-resource "azurerm_subnet" "appgw_subnet" {
-  name                 = "appgw_subnet"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet1.name
-  address_prefixes     = [var.appgw_subnet_address_prefix]
-}
-# <<< archly:group:appgw_subnet <<<
 
-# >>> archly:group:apps_subnet >>>
-# Container Apps Subnet (subnet within 'Workload VNet')
 
-resource "azurerm_subnet" "apps_subnet" {
-  name                 = "apps_subnet"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet1.name
-  address_prefixes     = [var.apps_subnet_address_prefix]
-}
-# <<< archly:group:apps_subnet <<<
 
-# >>> archly:group:pe_subnet >>>
-# Private Endpoint Subnet (subnet within 'Workload VNet')
 
-resource "azurerm_subnet" "pe_subnet" {
-  name                 = "pe_subnet"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet1.name
-  address_prefixes     = [var.pe_subnet_address_prefix]
-}
-# <<< archly:group:pe_subnet <<<
 
 # >>> archly:node:afd1 >>>
 # Azure Front Door (cdn)
@@ -132,132 +78,24 @@ resource "azurerm_cdn_frontdoor_endpoint" "afd1" {
 }
 # <<< archly:node:afd1 <<<
 
-# >>> archly:node:appgw1 >>>
-# App Gateway WAF (network.application_gateway) -- belongs to subnet 'App Gateway Subnet' (see resource id 'appgw_subnet' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_application_gateway" "appgw1" {
-  name = var.appgw1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_application_gateway
-  # and add every required argument before applying.
-}
-# <<< archly:node:appgw1 <<<
 
-# >>> archly:node:apps1 >>>
-# Container Apps (compute.container) -- belongs to subnet 'Container Apps Subnet' (see resource id 'apps_subnet' above; wire this resource's subnet/network args to it manually)
-resource "azurerm_log_analytics_workspace" "apps1_logs" {
-  name                = "apps1-logs"
-  location            = local.location
-  resource_group_name = local.resource_group_name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
 
-resource "azurerm_container_app_environment" "apps1_env" {
-  name                       = "apps1-env"
-  location                   = local.location
-  resource_group_name        = local.resource_group_name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.apps1_logs.id
-}
 
-resource "azurerm_container_app" "apps1" {
-  name                         = "apps1"
-  resource_group_name          = local.resource_group_name
-  container_app_environment_id = azurerm_container_app_environment.apps1_env.id
-  revision_mode                = "Single"
-  template {
-    container {
-      name   = "apps1"
-      image  = var.apps1_container_image
-      cpu    = 0.5
-      memory = "1Gi"
-    }
-  }
-}
-# <<< archly:node:apps1 <<<
 
-# >>> archly:node:mi1 >>>
-# Managed Identity (identity.managed) -- belongs to network 'Security & Operations' (see resource id 'security_ops' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_managed" "mi1" {
-  name = var.mi1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_managed
-  # and add every required argument before applying.
-}
-# <<< archly:node:mi1 <<<
 
-# >>> archly:node:sqlpe1 >>>
-# SQL Private Endpoint (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'pe_subnet' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "sqlpe1" {
-  name = var.sqlpe1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
-  # and add every required argument before applying.
-}
-# <<< archly:node:sqlpe1 <<<
 
-# >>> archly:node:redispe1 >>>
-# Redis Private Endpoint (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'pe_subnet' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "redispe1" {
-  name = var.redispe1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
-  # and add every required argument before applying.
-}
-# <<< archly:node:redispe1 <<<
 
-# >>> archly:node:sbpe1 >>>
-# Service Bus Endpoint (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'pe_subnet' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "sbpe1" {
-  name = var.sbpe1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
-  # and add every required argument before applying.
-}
-# <<< archly:node:sbpe1 <<<
 
-# >>> archly:node:blobpe1 >>>
-# Blob Private Endpoint (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'pe_subnet' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "blobpe1" {
-  name = var.blobpe1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
-  # and add every required argument before applying.
-}
-# <<< archly:node:blobpe1 <<<
 
-# >>> archly:node:kvpe1 >>>
-# Key Vault Endpoint (network.private_endpoint)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "kvpe1" {
-  name = var.kvpe1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
-
-  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
-  # and add every required argument before applying.
-}
-# <<< archly:node:kvpe1 <<<
 
 # >>> archly:node:sql1 >>>
-# Azure SQL Primary (database.relational) -- belongs to network 'Managed Data Services' (see resource id 'data_services' above; wire this resource's subnet/network args to it manually)
+# Azure SQL (database.relational) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
 resource "azurerm_postgresql_flexible_server" "sql1" {
   name                   = "sql1-${local.name_suffix}"
   resource_group_name    = local.resource_group_name
@@ -270,22 +108,10 @@ resource "azurerm_postgresql_flexible_server" "sql1" {
 }
 # <<< archly:node:sql1 <<<
 
-# >>> archly:node:sql2 >>>
-# Azure SQL Failover (database.relational) -- belongs to network 'Managed Data Services' (see resource id 'data_services' above; wire this resource's subnet/network args to it manually)
-resource "azurerm_postgresql_flexible_server" "sql2" {
-  name                   = "sql2-${local.name_suffix}"
-  resource_group_name    = local.resource_group_name
-  location               = local.location
-  administrator_login    = var.sql2_administrator_login
-  administrator_password = var.sql2_administrator_password
-  sku_name               = "B_Standard_B1ms"
-  storage_mb             = 32768
-  version                = "15"
-}
-# <<< archly:node:sql2 <<<
+
 
 # >>> archly:node:redis1 >>>
-# Azure Cache Redis (database.cache) -- belongs to network 'Managed Data Services' (see resource id 'data_services' above; wire this resource's subnet/network args to it manually)
+# Cache for Redis (database.cache) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
 resource "azurerm_redis_cache" "redis1" {
   name                = "redis1-${local.name_suffix}"
   resource_group_name = local.resource_group_name
@@ -298,23 +124,10 @@ resource "azurerm_redis_cache" "redis1" {
 }
 # <<< archly:node:redis1 <<<
 
-# >>> archly:node:sb1 >>>
-# Service Bus (queue) -- belongs to network 'Managed Data Services' (see resource id 'data_services' above; wire this resource's subnet/network args to it manually)
-resource "azurerm_servicebus_namespace" "sb1_ns" {
-  name                = "sb1-ns-${local.name_suffix}"
-  location            = local.location
-  resource_group_name = local.resource_group_name
-  sku                 = "Standard"
-}
 
-resource "azurerm_servicebus_queue" "sb1" {
-  name         = "sb1"
-  namespace_id = azurerm_servicebus_namespace.sb1_ns.id
-}
-# <<< archly:node:sb1 <<<
 
 # >>> archly:node:blob1 >>>
-# Blob Storage (storage.object) -- belongs to network 'Managed Data Services' (see resource id 'data_services' above; wire this resource's subnet/network args to it manually)
+# Blob Storage (storage.object) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
 resource "azurerm_storage_account" "blob1" {
   name                     = substr("stblob1${local.name_suffix}", 0, 24)
   resource_group_name      = local.resource_group_name
@@ -325,55 +138,13 @@ resource "azurerm_storage_account" "blob1" {
 }
 # <<< archly:node:blob1 <<<
 
-# >>> archly:node:kv1 >>>
-# Key Vault (secrets)
-resource "azurerm_key_vault" "kv1" {
-  name                       = "kv1-${local.name_suffix}"
-  resource_group_name        = local.resource_group_name
-  location                   = local.location
-  tenant_id                  = var.tenant_id
-  sku_name                   = "standard"
-  purge_protection_enabled   = true
-  soft_delete_retention_days = 90
-}
-# <<< archly:node:kv1 <<<
 
-# >>> archly:node:dns1 >>>
-# Private DNS Zones (dns.private) -- belongs to network 'Security & Operations' (see resource id 'security_ops' above; wire this resource's subnet/network args to it manually)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private" "dns1" {
-  name = var.dns1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_private
-  # and add every required argument before applying.
-}
-# <<< archly:node:dns1 <<<
 
-# >>> archly:node:mon1 >>>
-# Azure Monitor (monitoring)
-resource "azurerm_log_analytics_workspace" "mon1" {
-  name                = "mon1"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
-# <<< archly:node:mon1 <<<
 
-# >>> archly:node:logs1 >>>
-# Log Analytics (logging)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_logging" "logs1" {
-  name = var.logs1_name
-  resource_group_name = local.resource_group_name
-  location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_logging
-  # and add every required argument before applying.
-}
-# <<< archly:node:logs1 <<<
+
+
 
 # >>> archly:node:azure_policy >>>
 # Azure Policy (governance.policy)
@@ -388,41 +159,334 @@ resource "azurerm_policy" "azure_policy" {
 }
 # <<< archly:node:azure_policy <<<
 
-# >>> archly:node:microsoft_entra_id >>>
-# Microsoft Entra ID (auth.identity_center)
+# >>> archly:group:azurefirewallsubnet >>>
+# AzureFirewallSubnet (subnet within 'Management Group')
+
+resource "azurerm_subnet" "azurefirewallsubnet" {
+  name                 = "azurefirewallsubnet"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.azurefirewallsubnet_address_prefix]
+}
+# <<< archly:group:azurefirewallsubnet <<<
+
+# >>> archly:group:mgmt_group >>>
+# Management Group (network boundary)
+
+resource "azurerm_virtual_network" "mgmt_group" {
+  name                = "mgmt_group"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  address_space       = [var.mgmt_group_address_space]
+}
+# <<< archly:group:mgmt_group <<<
+
+# >>> archly:group:subnet1 >>>
+# Application Subnet (subnet within 'Management Group')
+
+resource "azurerm_subnet" "subnet1" {
+  name                 = "subnet1"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.subnet1_address_prefix]
+}
+# <<< archly:group:subnet1 <<<
+
+# >>> archly:group:subnet2 >>>
+# Data Subnet (subnet within 'Management Group')
+
+resource "azurerm_subnet" "subnet2" {
+  name                 = "subnet2"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.subnet2_address_prefix]
+}
+# <<< archly:group:subnet2 <<<
+
+# >>> archly:group:subnet3 >>>
+# Private Endpoint Subnet (subnet within 'Management Group')
+
+resource "azurerm_subnet" "subnet3" {
+  name                 = "subnet3"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.subnet3_address_prefix]
+}
+# <<< archly:group:subnet3 <<<
+
+# >>> archly:group:subscription >>>
+# Subscription (subnet within 'Management Group')
+
+resource "azurerm_subnet" "subscription" {
+  name                 = "subscription"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.mgmt_group.name
+  address_prefixes     = [var.subscription_address_prefix]
+}
+# <<< archly:group:subscription <<<
+
+# >>> archly:node:agw1 >>>
+# App Gateway WAF (network.application_gateway) -- belongs to subnet 'Application Subnet' (see resource id 'subnet1' above; wire this resource's subnet/network args to it manually)
 # Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_identity_center" "microsoft_entra_id" {
-  name = var.microsoft_entra_id_name
+resource "azurerm_application_gateway" "agw1" {
+  name = var.agw1_name
   resource_group_name = local.resource_group_name
   location            = local.location
 
-  # TODO: Review the Terraform provider docs for azurerm_identity_center
+  # TODO: Review the Terraform provider docs for azurerm_application_gateway
   # and add every required argument before applying.
 }
-# <<< archly:node:microsoft_entra_id <<<
+# <<< archly:node:agw1 <<<
 
-# >>> archly:node:defender_for_cloud >>>
-# Defender for Cloud (security.guardduty)
-# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_guardduty" "defender_for_cloud" {
-  name = var.defender_for_cloud_name
+# >>> archly:node:app_insights >>>
+# Application Insights (monitoring)
+resource "azurerm_log_analytics_workspace" "app_insights" {
+  name                = "app_insights"
   resource_group_name = local.resource_group_name
   location            = local.location
-
-  # TODO: Review the Terraform provider docs for azurerm_guardduty
-  # and add every required argument before applying.
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
 }
-# <<< archly:node:defender_for_cloud <<<
+# <<< archly:node:app_insights <<<
 
-# >>> archly:node:sql2_pe >>>
-# Azure SQL Failover PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'pe_subnet' above; wire this resource's subnet/network args to it manually)
+# >>> archly:node:azure_firewall >>>
+# Azure Firewall (firewall) -- belongs to subnet 'AzureFirewallSubnet' (see resource id 'azurefirewallsubnet' above; wire this resource's subnet/network args to it manually)
+resource "azurerm_web_application_firewall_policy" "azure_firewall" {
+  name                = "azure_firewall"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  managed_rules {
+    managed_rule_set {
+      type    = "OWASP"
+      version = "3.2"
+    }
+  }
+}
+# <<< archly:node:azure_firewall <<<
+
+# >>> archly:node:azure_monitor >>>
+# Azure Monitor (monitoring)
+resource "azurerm_log_analytics_workspace" "azure_monitor" {
+  name                = "azure_monitor"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+# <<< archly:node:azure_monitor <<<
+
+# >>> archly:node:blob1_pe >>>
+# Blob Storage PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
 # Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
-resource "azurerm_private_endpoint" "sql2_pe" {
-  name = var.sql2_pe_name
+resource "azurerm_private_endpoint" "blob1_pe" {
+  name = var.blob1_pe_name
   resource_group_name = local.resource_group_name
   location            = local.location
 
   # TODO: Review the Terraform provider docs for azurerm_private_endpoint
   # and add every required argument before applying.
 }
-# <<< archly:node:sql2_pe <<<
+# <<< archly:node:blob1_pe <<<
+
+# >>> archly:node:containerapps1 >>>
+# Container Apps (compute.container) -- belongs to subnet 'Application Subnet' (see resource id 'subnet1' above; wire this resource's subnet/network args to it manually)
+resource "azurerm_log_analytics_workspace" "containerapps1_logs" {
+  name                = "containerapps1-logs"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_container_app_environment" "containerapps1_env" {
+  name                       = "containerapps1-env"
+  location                   = local.location
+  resource_group_name        = local.resource_group_name
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.containerapps1_logs.id
+}
+
+resource "azurerm_container_app" "containerapps1" {
+  name                         = "containerapps1"
+  resource_group_name          = local.resource_group_name
+  container_app_environment_id = azurerm_container_app_environment.containerapps1_env.id
+  revision_mode                = "Single"
+  template {
+    container {
+      name   = "containerapps1"
+      image  = var.containerapps1_container_image
+      cpu    = 0.5
+      memory = "1Gi"
+    }
+  }
+}
+# <<< archly:node:containerapps1 <<<
+
+# >>> archly:node:defender >>>
+# Defender for Cloud (security.security_hub)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_security_hub" "defender" {
+  name = var.defender_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_security_hub
+  # and add every required argument before applying.
+}
+# <<< archly:node:defender <<<
+
+# >>> archly:node:keyvault1 >>>
+# Key Vault (secrets.manager)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_manager" "keyvault1" {
+  name = var.keyvault1_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_manager
+  # and add every required argument before applying.
+}
+# <<< archly:node:keyvault1 <<<
+
+# >>> archly:node:keyvault1_pe >>>
+# Key Vault PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private_endpoint" "keyvault1_pe" {
+  name = var.keyvault1_pe_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
+  # and add every required argument before applying.
+}
+# <<< archly:node:keyvault1_pe <<<
+
+# >>> archly:node:log_analytics >>>
+# Log Analytics (monitoring)
+resource "azurerm_log_analytics_workspace" "log_analytics" {
+  name                = "log_analytics"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+# <<< archly:node:log_analytics <<<
+
+# >>> archly:node:managed_identity >>>
+# Managed Identity (identity.managed) -- belongs to subnet 'Subscription' (see resource id 'subscription' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_managed" "managed_identity" {
+  name = var.managed_identity_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_managed
+  # and add every required argument before applying.
+}
+# <<< archly:node:managed_identity <<<
+
+# >>> archly:node:private_dns >>>
+# Private DNS Zone (dns.private) -- belongs to subnet 'Subscription' (see resource id 'subscription' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private" "private_dns" {
+  name = var.private_dns_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private
+  # and add every required argument before applying.
+}
+# <<< archly:node:private_dns <<<
+
+# >>> archly:node:rbac >>>
+# Microsoft Entra ID/RBAC (auth.identity_center)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_identity_center" "rbac" {
+  name = var.rbac_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_identity_center
+  # and add every required argument before applying.
+}
+# <<< archly:node:rbac <<<
+
+# >>> archly:node:redis1_pe >>>
+# Cache for Redis PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private_endpoint" "redis1_pe" {
+  name = var.redis1_pe_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
+  # and add every required argument before applying.
+}
+# <<< archly:node:redis1_pe <<<
+
+# >>> archly:node:servicebus1 >>>
+# Service Bus (queue) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+resource "azurerm_servicebus_namespace" "servicebus1_ns" {
+  name                = "servicebus1-ns-${local.name_suffix}"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+  sku                 = "Standard"
+}
+
+resource "azurerm_servicebus_queue" "servicebus1" {
+  name         = "servicebus1"
+  namespace_id = azurerm_servicebus_namespace.servicebus1_ns.id
+}
+# <<< archly:node:servicebus1 <<<
+
+# >>> archly:node:servicebus1_pe >>>
+# Service Bus PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private_endpoint" "servicebus1_pe" {
+  name = var.servicebus1_pe_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
+  # and add every required argument before applying.
+}
+# <<< archly:node:servicebus1_pe <<<
+
+# >>> archly:node:sql1_pe >>>
+# Azure SQL PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private_endpoint" "sql1_pe" {
+  name = var.sql1_pe_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
+  # and add every required argument before applying.
+}
+# <<< archly:node:sql1_pe <<<
+
+# >>> archly:node:sql_failover >>>
+# SQL Failover (database.relational) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+resource "azurerm_postgresql_flexible_server" "sql_failover" {
+  name                   = "sql_failover-${local.name_suffix}"
+  resource_group_name    = local.resource_group_name
+  location               = local.location
+  administrator_login    = var.sql_failover_administrator_login
+  administrator_password = var.sql_failover_administrator_password
+  sku_name               = "B_Standard_B1ms"
+  storage_mb             = 32768
+  version                = "15"
+}
+# <<< archly:node:sql_failover <<<
+
+# >>> archly:node:sql_failover_pe >>>
+# SQL Failover PE (network.private_endpoint) -- belongs to subnet 'Private Endpoint Subnet' (see resource id 'subnet3' above; wire this resource's subnet/network args to it manually)
+# Fallback scaffold: provider-specific mapping is not curated yet. Review and complete required arguments before applying.
+resource "azurerm_private_endpoint" "sql_failover_pe" {
+  name = var.sql_failover_pe_name
+  resource_group_name = local.resource_group_name
+  location            = local.location
+
+  # TODO: Review the Terraform provider docs for azurerm_private_endpoint
+  # and add every required argument before applying.
+}
+# <<< archly:node:sql_failover_pe <<<
