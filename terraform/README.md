@@ -1,4 +1,4 @@
-# Terraform scaffold for "Azure Microservices SaaS App - Standard Alternative"
+# Terraform scaffold for "Azure Microservices SaaS App - Improved"
 
 Generated from the architecture diagram (provider: azure). This is a
 **starting scaffold**, not a finished production module -- it creates NEW
